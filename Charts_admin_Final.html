@@ -842,6 +842,9 @@ function getExportHTML(includeAdmin){
     // Remove admin section
     const adminSection = clone.querySelector('#tab-admin');
     if(adminSection) adminSection.remove();
+    // Remove topbar entirely
+    const topbar = clone.querySelector('.topbar');
+    if(topbar) topbar.remove();
   }
 
   return '<!DOCTYPE html>\n' + clone.outerHTML;
