@@ -193,9 +193,9 @@
           <!-- <label>მაჩვენებელი</label> -->
           <!-- <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var;margin-bottom:12px">მაჩვენებელი</div> -->
           <div class="metric-pills">
-            <button class="pill ac" data-m="request count">შემთხვევა</button>
-            <button class="pill" data-m="beneficiary count">ბენეფიციარი</button>
-            <button class="pill" data-m="amount">თანხა</button>
+            <button class="pill ac" data-m="request count" style="display: none;">შემთხვევა</button>
+            <button class="pill" data-m="beneficiary count" style="display: none;">ბენეფიციარი</button>
+            <button class="pill" data-m="amount" style="display: none;">თანხა</button>
           </div>
         </div>
         <div class="field" style="grid-column:2;justify-self:end">
@@ -226,7 +226,7 @@
         </div>
       </div>
       <div class="chart-wrap" style="height: 320px;">
-        <canvas id="main-chart" style="box-sizing: border-box; display: block; height: 320px; width: 978px;" width="978" height="320"></canvas>
+        <canvas id="main-chart" style="box-sizing: border-box; display: block; height: 320px; width: 978px;" width="1223" height="400"></canvas>
         <div class="no-data" id="no-data"><div style="font-size:28px;opacity:.4">🔍</div><span>მონაცემები ვერ მოიძებნა</span></div>
       </div>
       <div id="chart-legend" class="chart-legend" style="display: none;"><div class="legend-item"><div class="legend-dot" style="background:#3a6b8a"></div><span>undefined</span></div></div>
@@ -379,6 +379,9 @@ function getFiltered(){
 
 function renderDashboard(){
   const rows = getFiltered();
+  
+  updateMetricButtons(rows);
+
   const loader = document.getElementById('loader');
   const noData = document.getElementById('no-data');
   const legendEl = document.getElementById('chart-legend');
@@ -926,7 +929,41 @@ document.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key==='s')
 
 // ── Init ──────────────────────────────────────────────────────
 detectExtraCols(); sortData(); buildSelects(); renderDashboard(); switchTab('dashboard'); switchTab('dashboard');
-</script>
 
+////მაჩვენებლის ღილაკის დამალვა თუ მონაცემი არ არსობობს
+function updateMetricButtons(filteredData) {
+  const metrics = [
+    { key: "request count", selector: '[data-m="request count"]' },
+    { key: "beneficiary count", selector: '[data-m="beneficiary count"]' },
+    { key: "amount", selector: '[data-m="amount"]' }
+  ];
+
+  metrics.forEach(m => {
+    const hasData = filteredData.some(d => {
+      const val = d[m.key];
+      return val !== null && val !== undefined && val !== "";
+    });
+
+    const btn = document.querySelector(m.selector);
+
+    if (btn) {
+      btn.style.display = hasData ? "" : "none";
+    }
+  });
+
+  // 🔥 ეს არის ახალი ლოგიკა (forEach-ის გარეთ!)
+  const visibleButtons = [...document.querySelectorAll('.metric-pills .pill')]
+    .filter(b => b.style.display !== 'none');
+
+  const active = visibleButtons.find(b => b.classList.contains("ac"));
+
+  if (!active && visibleButtons.length) {
+    document.querySelectorAll('.pill').forEach(b => b.classList.remove("ac"));
+    visibleButtons[0].classList.add("ac");
+
+    curMetric = visibleButtons[0].dataset.m;
+  }
+}
+</script>
 
 </body></html>
