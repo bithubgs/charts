@@ -475,17 +475,12 @@ function getFiltered(){
 
 function renderDashboard(){
   const rows = getFiltered();
-  
   updateMetricButtons(rows);
-
   const loader = document.getElementById('loader');
   const noData = document.getElementById('no-data');
   const legendEl = document.getElementById('chart-legend');
   const stackToggle = document.getElementById('stack-toggle');
-
   document.getElementById('chart-name').textContent = curSub;
-
-
   const hasGroup = curGroupBy && curGroupBy!=='';
   stackToggle.style.display = (hasGroup && curChartType!=='pie') ? 'flex' : 'none';
 
@@ -1047,17 +1042,18 @@ function updateMetricButtons(filteredData) {
     }
   });
 
-  // 🔥 ეს არის ახალი ლოგიკა (forEach-ის გარეთ!)
+  // აქტიური ღილაკის შემოწმება (ac = count, aa = amount) და საჭიროების შემთხვევაში გადართვა
   const visibleButtons = [...document.querySelectorAll('.metric-pills .pill')]
     .filter(b => b.style.display !== 'none');
 
-  const active = visibleButtons.find(b => b.classList.contains("ac"));
+  const active = visibleButtons.find(b => b.classList.contains("ac") || b.classList.contains("aa"));
 
   if (!active && visibleButtons.length) {
-    document.querySelectorAll('.pill').forEach(b => b.classList.remove("ac"));
-    visibleButtons[0].classList.add("ac");
-
-    curMetric = visibleButtons[0].dataset.m;
+    // არცერთი ღილაკი არ არის აქტიური — გავააქტიუროთ პირველი
+    document.querySelectorAll('.pill').forEach(b => { b.classList.remove("ac"); b.classList.remove("aa"); });
+    const first = visibleButtons[0];
+    first.classList.add(first.dataset.m === 'amount' ? 'aa' : 'ac');
+    curMetric = first.dataset.m;
   }
 }
 </script>
