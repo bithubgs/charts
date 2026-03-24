@@ -275,7 +275,7 @@
         </div>
       </div>
       <div class="chart-wrap" style="height: 320px;">
-        <canvas id="main-chart" style="box-sizing: border-box; display: block; height: 320px; width: 978px;" width="1223" height="400"></canvas>
+        <canvas id="main-chart" style="box-sizing: border-box; display: block; height: 0px; width: 0px;" width="0" height="0"></canvas>
         <div class="no-data" id="no-data"><div style="font-size:28px;opacity:.4">🔍</div><span>მონაცემები ვერ მოიძებნა</span></div>
       </div>
       <div id="chart-legend" class="chart-legend" style="display: none;"><div class="legend-item"><div class="legend-dot" style="background:#3a6b8a"></div><span>undefined</span></div></div>
@@ -297,7 +297,7 @@
   
 
 
-<div class="toast" id="toast">✓ კონფიგურაცია გამოყენებულია</div>
+<div class="toast" id="toast">✓ შენახულია — Charts_admin_Final.html</div>
 
 
 <script>
@@ -928,7 +928,6 @@ const labelPlugin = {
     if(ch.config.type==='pie') return;
     const ctx=ch.ctx;
     const ink = getComputedStyle(document.documentElement).getPropertyValue('--ink').trim()||'#1a1814';
-    // Collect all placed label bounding boxes for collision detection
     const placed = [];
 
     function overlaps(box){
@@ -958,16 +957,12 @@ const labelPlugin = {
           const isLocalMin = prev && next && point.y > prev.y && point.y > next.y;
 
           if(isLocalMin){
-            // Valley: check angle in DATA space (not pixel space)
             const vPrev = ds.data[idx-1], vNext = ds.data[idx+1], vCur = ds.data[idx];
-            // Normalize: use chart Y scale range to get comparable units
-            const yScale = ch.scales[ch.data.datasets[i].yAxisID || 'y1'] || ch.scales['y1'] || ch.scales['y'];
+            const yScale = ch.scales[ds.yAxisID || 'y1'] || ch.scales['y1'] || ch.scales['y'];
             const yRange = yScale ? (yScale.max - yScale.min) : 1;
             const xRange = ch.data.labels.length - 1 || 1;
-            // Slopes on each side (in normalized units)
             const slopeLeft  = Math.abs(((vCur - vPrev) / yRange) / (1 / xRange));
             const slopeRight = Math.abs(((vNext - vCur) / yRange) / (1 / xRange));
-            // If both slopes are steep (sharp V) → label below
             const isSharpValley = slopeLeft > 0.15 || slopeRight > 0.15;
             if(isSharpValley){
               tx = point.x; ty = point.y + 14; baseline = 'top';
@@ -977,14 +972,24 @@ const labelPlugin = {
           } else {
             tx = point.x; ty = point.y - 14; baseline = 'bottom';
           }
+          // Line labels: skip on collision (don't push)
+          const box = { x: tx - tw/2 - 1, y: baseline==='bottom' ? ty - th : ty, w: tw + 2, h: th };
+          if(overlaps(box)){ ctx.restore(); return; }
+          placed.push(box);
         } else {
-          tx = point.x; ty = point.y - 5; baseline = 'bottom';
+          // Bar labels: start just above bar top, push up if overlapping
+          tx = point.x;
+          ty = point.y - 5;
+          baseline = 'bottom';
+          const stepUp = th + 2;
+          let box = { x: tx - tw/2 - 1, y: ty - th, w: tw + 2, h: th };
+          // Push up until no overlap (max 4 steps)
+          for(let attempt = 0; attempt < 4 && overlaps(box); attempt++){
+            ty -= stepUp;
+            box = { x: tx - tw/2 - 1, y: ty - th, w: tw + 2, h: th };
+          }
+          placed.push(box);
         }
-
-        // Bounding box for collision (centered on tx)
-        const box = { x: tx - tw/2 - 1, y: baseline==='bottom' ? ty - th : ty, w: tw + 2, h: th };
-        if(overlaps(box)) { ctx.restore(); return; } // skip overlapping label
-        placed.push(box);
 
         ctx.fillStyle = ink;
         ctx.textAlign = 'center';
