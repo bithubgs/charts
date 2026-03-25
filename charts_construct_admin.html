@@ -40,6 +40,7 @@
     .pill-wrap .pill{border-radius:6px 0 0 6px}
     .pill.ac,.ctype-pill.ac{background:var(--white);color:var(--blue);box-shadow:0 1px 4px rgba(0,0,0,.09)}
     .pill.aa,.ctype-pill.aa{background:var(--white);color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,.09)}
+    .pill.pill-active-custom{background:var(--white);box-shadow:0 1px 4px rgba(0,0,0,.09)}
     .chart-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:28px;position:relative;margin-bottom:10px}
     .chart-top{display:flex;justify-content:center;align-items:flex-start;margin-bottom:10px;gap:14px;flex-wrap:wrap}
     .chart-eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-bottom:4px}
@@ -54,7 +55,7 @@
     .chart-wrap{position:relative;height:320px}
     .no-data{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);font-size:14px;gap:8px;opacity:0;pointer-events:none;transition:opacity .2s}
     .no-data.show{opacity:1;pointer-events:auto}
-    .chart-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+    .chart-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);justify-content:center}
     .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500}
     .legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
     /* Data table */
@@ -283,7 +284,7 @@
         <canvas id="main-chart" style="box-sizing: border-box; display: block; height: 320px; width: 936px;" width="936" height="320"></canvas>
         <div class="no-data" id="no-data"><div style="font-size:28px;opacity:.4">🔍</div><span>მონაცემები ვერ მოიძებნა</span></div>
       </div>
-      <div id="chart-legend" class="chart-legend" style="display: none;"><div class="legend-item"><div class="legend-dot" style="background:#286496"></div><span>შემთხვევა</span></div><div class="legend-item"><div class="legend-dot" style="background:#ab4444"></div><span>ბენეფიციარი</span></div></div>
+      <div id="chart-legend" class="chart-legend" style="text-align:center;justify-content:center; display: none;"><div class="legend-item"><div class="legend-dot" style="background:#286496"></div><span>შემთხვევა</span></div><div class="legend-item"><div class="legend-dot" style="background:#ab4444"></div><span>ბენეფიციარი</span></div></div>
     </div>
 
     <div class="data-table-card">
@@ -1663,8 +1664,18 @@ function updatePillStyles(cont){
     const cfg = METRIC_CONFIG.find(m=>m.key===key);
     const isActive = activeMetrics.has(key);
     btn.className = 'pill';
+    btn.style.color = '';
+    btn.style.fontWeight = '';
     if(isActive){
-      btn.classList.add((cfg?.type==='amount'||cfg?.type==='pct')?'aa':'ac');
+      const metricColor = cfg?.color || null;
+      if(metricColor){
+        // active state: use metric color for text, white bg with shadow
+        btn.classList.add('pill-active-custom');
+        btn.style.color = metricColor;
+        btn.style.fontWeight = '700';
+      } else {
+        btn.classList.add((cfg?.type==='amount'||cfg?.type==='pct')?'aa':'ac');
+      }
     }
     // sync type-toggle icon
     const wrap = cont.querySelector(`.pill-wrap[data-m="${key}"]`);
