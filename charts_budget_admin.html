@@ -25,13 +25,13 @@
     .page-title p{margin-top:7px;font-size:14px;color:var(--muted)}
     .controls-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:10px}
     .controls-grid{display:grid;grid-template-columns:1fr 2fr;grid-template-rows:auto auto;gap:10px 16px;align-items:end}
-    .field{display:flex;flex-direction:column;gap:4px;margin-bottom:5px;}
+    .field{display:flex;flex-direction:column;gap:4px}
     .field label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
     select{background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--ink);padding:8px 28px 8px 10px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239b9690' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;transition:border-color .15s;min-width:130px}
     #sub-sel{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     #prog-sel,#sub-sel{width:100%}
     select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(58,107,138,.12)}
-    .metric-pills{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px;gap:3px;margin-bottom:5px;}
+    .metric-pills{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:3px;gap:3px}
     .pill,.ctype-pill{padding:6px 13px;border:none;border-radius:6px;background:transparent;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .18s;white-space:nowrap}
     .pill-wrap{display:inline-flex;align-items:center;border-radius:6px;overflow:hidden;gap:0}
     .pill-type-toggle{display:inline-flex;align-items:center;justify-content:center;width:22px;font-size:13px;cursor:pointer;color:var(--muted);background:transparent;border:none;border-left:1px solid var(--border);padding:0;height:100%;transition:all .15s;flex-shrink:0;font-family:'DM Sans',sans-serif;line-height:1}
@@ -1214,7 +1214,7 @@ function updateCell(input){
   const allCols = DATA.length ? Object.keys(DATA[0]) : REQUIRED;
   const col = allCols[ci];
   const isNum = isNumCol(col);
-  DATA[ri][col] = (isNum && input.value !== '') ? +input.value : input.value;
+  DATA[ri][col] = (isNum && col !== 'year' && input.value !== '') ? +input.value : input.value;
   syncDash();
 }
 
