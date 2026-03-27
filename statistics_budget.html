@@ -249,7 +249,7 @@
         <!-- row 2: მაჩვენებელი | დიაგრამის ტიპი -->
         <div class="field" style="grid-column:1 / -1">
           <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-height:36px;">
-            <div class="metric-pills" style="flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;align-items:center;"><span class="pill-wrap" data-m="ბიუჯეტი" style="display:none"><button class="pill" data-m="ბიუჯეტი" style="display: none;">ბიუჯეტი (1000 ლარი)</button><span class="pill-type-toggle" data-m="ბიუჯეტი" title="ტიპის გადართვა">▬</span></span><span class="pill-wrap" data-m="ბიუჯეტის ხარჯი" style="display:none"><button class="pill" data-m="ბიუჯეტის ხარჯი" style="display: none;">ბიუჯეტის ხარჯი (1000 ლარი)</button><span class="pill-type-toggle" data-m="ბიუჯეტის ხარჯი" title="ტიპის გადართვა">▬</span></span><span class="pill-wrap" data-m="დარჩენილი თანხა" style="display:none"><button class="pill" data-m="დარჩენილი თანხა" style="display: none;">დარჩენილი თანხა (1000 ლარი)</button><span class="pill-type-toggle" data-m="დარჩენილი თანხა" title="ტიპის გადართვა">▬</span></span><span class="pill-wrap" data-m="შესრულების პროცენტი" style="display:none"><button class="pill" data-m="შესრულების პროცენტი" style="display: none;">შესრულების პროცენტი (1000 ლარი)</button><span class="pill-type-toggle pill-type-line" data-m="შესრულების პროცენტი" title="ტიპის გადართვა">∿</span></span></div>
+            <div class="metric-pills" style="flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;align-items:center;"><span class="pill-wrap" data-m="ბიუჯეტი" style="display:none"><button class="pill" data-m="ბიუჯეტი" style="display: none;">ბიუჯეტი (1000 ლარი)</button><span class="pill-type-toggle" data-m="ბიუჯეტი" title="ტიპის გადართვა">📊</span></span><span class="pill-wrap" data-m="ბიუჯეტის ხარჯი" style="display:none"><button class="pill" data-m="ბიუჯეტის ხარჯი" style="display: none;">ბიუჯეტის ხარჯი (1000 ლარი)</button><span class="pill-type-toggle" data-m="ბიუჯეტის ხარჯი" title="ტიპის გადართვა">📊</span></span><span class="pill-wrap" data-m="დარჩენილი თანხა" style="display:none"><button class="pill" data-m="დარჩენილი თანხა" style="display: none;">დარჩენილი თანხა (1000 ლარი)</button><span class="pill-type-toggle" data-m="დარჩენილი თანხა" title="ტიპის გადართვა">📊</span></span><span class="pill-wrap" data-m="შესრულების პროცენტი" style="display:none"><button class="pill" data-m="შესრულების პროცენტი" style="display: none;">შესრულების პროცენტი (1000 ლარი)</button><span class="pill-type-toggle pill-type-line" data-m="შესრულების პროცენტი" title="ტიპის გადართვა">📈</span></span></div>
         </div>
         <div id="extra-filters" style="display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end;"></div>
       </div>
@@ -1656,7 +1656,7 @@ function rebuildDashboardPills(){
   cont.innerHTML = METRIC_CONFIG.map(m=> {
     // type toggle icon (only if showPillTypeToggle is on)
     const ct = m.chartType || 'bar';
-    const icon = ct === 'line' ? '∿' : '▬';
+    const icon = ct === 'line' ? '📈' : '📊';
     const toggleBtn = showPillTypeToggle
       ? `<span class="pill-type-toggle" data-m="${m.key}" title="ტიპის გადართვა">${icon}</span>`
       : '';
@@ -1704,7 +1704,7 @@ function rebuildDashboardPills(){
       // cycle: auto→bar→line→bar→line...
       const cur = cfg.chartType || 'bar';
       cfg.chartType = (cur === 'line') ? 'bar' : 'line';
-      btn.textContent = cfg.chartType === 'line' ? '∿' : '▬';
+      btn.textContent = cfg.chartType === 'line' ? '📈' : '📊';
       // auto-activate this metric if not already active
       if(!activeMetrics.has(key)){
         const grp = cfg?.group || 1;
@@ -1758,7 +1758,7 @@ function updatePillStyles(cont){
     const tog = wrap?.querySelector('.pill-type-toggle');
     if(tog && cfg){
       const ct = cfg.chartType || 'bar';
-      tog.textContent = ct === 'line' ? '∿' : '▬';
+      tog.textContent = ct === 'line' ? '📈' : '📊';
       tog.classList.toggle('pill-type-line', ct === 'line');
     }
   });
