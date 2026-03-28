@@ -263,7 +263,7 @@
         <!-- row 2: მაჩვენებელი | დიაგრამის ტიპი -->
         <div class="field" style="grid-column:1 / -1">
           <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-height:36px;">
-            <div class="metric-pills" style="flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;align-items:center;"><span class="pill-wrap" data-m="ბიუჯეტი" style="display:none"><button class="pill" data-m="ბიუჯეტი" style="display: none;">ბიუჯეტი (1000 ლარი)</button><span class="pill-type-toggle" data-m="ბიუჯეტი" title="ტიპის გადართვა">▬</span></span><span class="pill-wrap" data-m="ბიუჯეტის ხარჯი" style="display:none"><button class="pill" data-m="ბიუჯეტის ხარჯი" style="display: none;">ბიუჯეტის ხარჯი (1000 ლარი)</button><span class="pill-type-toggle" data-m="ბიუჯეტის ხარჯი" title="ტიპის გადართვა">▬</span></span><span class="pill-wrap" data-m="დარჩენილი თანხა" style="display:none"><button class="pill" data-m="დარჩენილი თანხა" style="display: none;">დარჩენილი თანხა (1000 ლარი)</button><span class="pill-type-toggle" data-m="დარჩენილი თანხა" title="ტიპის გადართვა">▬</span></span><span class="pill-wrap" data-m="შესრულების პროცენტი" style="display:none"><button class="pill" data-m="შესრულების პროცენტი" style="display: none;">შესრულების პროცენტი (1000 ლარი)</button><span class="pill-type-toggle pill-type-line" data-m="შესრულების პროცენტი" title="ტიპის გადართვა">∿</span></span></div>
+            <div class="metric-pills" style="flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:6px;align-items:center;"><span class="pill-wrap" data-m="ბიუჯეტი" style="display:none"><button class="pill" data-m="ბიუჯეტი" style="display: none;">ბიუჯეტი (1000 ლარი)</button><span class="pill-type-toggle" data-m="ბიუჯეტი" title="ტიპის გადართვა">📊</span></span><span class="pill-wrap" data-m="ბიუჯეტის ხარჯი" style="display:none"><button class="pill" data-m="ბიუჯეტის ხარჯი" style="display: none;">ბიუჯეტის ხარჯი (1000 ლარი)</button><span class="pill-type-toggle" data-m="ბიუჯეტის ხარჯი" title="ტიპის გადართვა">📊</span></span><span class="pill-wrap" data-m="დარჩენილი თანხა" style="display:none"><button class="pill" data-m="დარჩენილი თანხა" style="display: none;">დარჩენილი თანხა (1000 ლარი)</button><span class="pill-type-toggle" data-m="დარჩენილი თანხა" title="ტიპის გადართვა">📊</span></span><span class="pill-wrap" data-m="შესრულების პროცენტი" style="display:none"><button class="pill" data-m="შესრულების პროცენტი" style="display: none;">შესრულების პროცენტი (1000 ლარი)</button><span class="pill-type-toggle pill-type-line" data-m="შესრულების პროცენტი" title="ტიპის გადართვა">📈</span></span></div>
         </div>
         <div id="extra-filters" style="display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end;"></div>
       </div>
@@ -1457,8 +1457,14 @@ function exportExcel(){
   // სათაურების სტრიქონი
   const header = cols.map(c => HEADERS[c] || c);
 
-  // მონაცემთა სტრიქონები
-  const rows = DATA.map(r => cols.map(c => r[c] ?? ''));
+  // მონაცემთა სტრიქონები — რიცხვური სვეტები Number-ად
+  const rows = DATA.map(r => cols.map(c => {
+    const v = r[c] ?? '';
+    if(v === '' || v == null) return '';
+    if(c === 'year') return String(v);
+    const n = parseFloat(String(v).replace(/[\s,]/g,''));
+    return (!isNaN(n) && isNumCol(c)) ? n : v;
+  }));
 
   // XLSX worksheet-ის შექმნა
   const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
@@ -1494,7 +1500,11 @@ function exportExcel(){
     for(let c = range.s.c; c <= range.e.c; c++){
       const addr = XLSX.utils.encode_cell({r,c});
       if(!ws[addr]) ws[addr]={t:'z',v:''};
-      const isText = ['program','subprogram'].includes(cols[c]);
+      const isText = ['program','subprogram','year'].includes(cols[c]);
+      if(!isText && ws[addr].t === 's'){
+        const n = parseFloat(ws[addr].v);
+        if(!isNaN(n)){ ws[addr].t = 'n'; ws[addr].v = n; }
+      }
       ws[addr].s = bodyStyle(isText, isOdd);
     }
   }
@@ -2340,4 +2350,5 @@ function updateMetricButtons(filteredData) {
   <!--ADMIN_END-->
 
 </div></div>
+
 </body></html>
