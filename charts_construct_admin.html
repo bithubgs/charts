@@ -1457,8 +1457,14 @@ function exportExcel(){
   // სათაურების სტრიქონი
   const header = cols.map(c => HEADERS[c] || c);
 
-  // მონაცემთა სტრიქონები
-  const rows = DATA.map(r => cols.map(c => r[c] ?? ''));
+  // მონაცემთა სტრიქონები — რიცხვური სვეტები Number-ად
+  const rows = DATA.map(r => cols.map(c => {
+    const v = r[c] ?? '';
+    if(v === '' || v == null) return '';
+    if(c === 'year') return String(v);
+    const n = parseFloat(String(v).replace(/[\s,]/g,''));
+    return (!isNaN(n) && isNumCol(c)) ? n : v;
+  }));
 
   // XLSX worksheet-ის შექმნა
   const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
@@ -1494,7 +1500,12 @@ function exportExcel(){
     for(let c = range.s.c; c <= range.e.c; c++){
       const addr = XLSX.utils.encode_cell({r,c});
       if(!ws[addr]) ws[addr]={t:'z',v:''};
-      const isText = ['program','subprogram'].includes(cols[c]);
+      const isText = ['program','subprogram','year'].includes(cols[c]);
+      // რიცხვური უჯრის ტიპი გამოვასწოროთ
+      if(!isText && ws[addr].t === 's'){
+        const n = parseFloat(ws[addr].v);
+        if(!isNaN(n)){ ws[addr].t = 'n'; ws[addr].v = n; }
+      }
       ws[addr].s = bodyStyle(isText, isOdd);
     }
   }
