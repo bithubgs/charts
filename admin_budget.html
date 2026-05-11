@@ -283,7 +283,7 @@
         </div>
       </div>
       <div class="chart-wrap" style="height: 320px;">
-        <canvas id="main-chart" style="box-sizing: border-box; display: block; height: 320px; width: 1116px;" width="1396" height="400"></canvas>
+        <canvas id="main-chart" style="box-sizing: border-box; display: block; height: 320px; width: 1116px;" width="1116" height="320"></canvas>
         <div class="no-data" id="no-data"><div style="font-size:28px;opacity:.4">🔍</div><span>მონაცემები ვერ მოიძებნა</span></div>
       </div>
       <div id="chart-legend" class="chart-legend" style="justify-content: center; display: none;"><div class="legend-item"><div class="legend-dot" style="background:#326e5a"></div><span>ბიუჯეტი (1000 ლარი)</span></div><div class="legend-item"><div class="legend-dot" style="background:#c86432"></div><span>ბიუჯეტის ხარჯი (1000 ლარი)</span></div><div class="legend-item"><div class="legend-dot" style="background:#6464a0"></div><span>დარჩენილი თანხა (1000 ლარი)</span></div><div class="legend-item"><div class="legend-dot" style="background:#8cbe64;height:3px;border-radius:2px;width:18px;margin-top:5px"></div><span>შესრულების პროცენტი</span></div></div>
@@ -313,7 +313,7 @@
   
 
 
-<div class="toast" id="toast">✓ ექსპორტი — statistics_budget.html</div>
+<div class="toast" id="toast">✓ ექსპორტი — budget.html</div>
 
 
 <script>
@@ -1435,8 +1435,8 @@ function exportTableExcel(){
   toast('✓ ცხრილი ჩამოიტვირთა');
 }
 
-function saveHTML(){ download(getExportHTML(true), 'charts_budget_admin.html'); toast('✓ შენახულია — charts_budget_admin.html'); }
-function exportPublicHTML(){ download(getExportHTML(false), 'statistics_budget.html'); toast('✓ ექსპორტი — statistics_budget.html'); }
+function saveHTML(){ download(getExportHTML(true), 'budget_admin.html'); toast('✓ შენახულია — budget_admin.html'); }
+function exportPublicHTML(){ download(getExportHTML(false), 'budget.html'); toast('✓ ექსპორტი — budget.html'); }
 
 // ── Excel-ად ექსპორტი ────────────────────────────────────────
 function exportExcel(){
@@ -2150,8 +2150,8 @@ function updateMetricButtons(filteredData) {
       <div class="info-box-icon">💡</div>
       <div>
         <h4>როგორ გამოვიყენო?</h4>
-        <p>შეიტანე Excel/CSV <strong>ან</strong> შეცვალე ხელით → <strong>💾 შენახვა</strong> → ჩამოიტვირთება <strong>charts_budget_admin.html</strong> (ყველა ცვლილებით).</p>
-        <p style="margin-top:5px;color:var(--blue)">საიტზე გასაგზავნად: <strong>⬇ ექსპორტი საიტისთვის</strong> → <strong>statistics_budget.html</strong></p>
+        <p>შეიტანე Excel/CSV <strong>ან</strong> შეცვალე ხელით → <strong>💾 შენახვა</strong> → ჩამოიტვირთება <strong>budget_admin.html</strong> (ყველა ცვლილებით).</p>
+        <p style="margin-top:5px;color:var(--blue)">საიტზე გასაგზავნად: <strong>⬇ ექსპორტი საიტისთვის</strong> → <strong>budget.html</strong></p>
       </div>
     </div>
 
@@ -2366,6 +2366,7 @@ function updateMetricButtons(filteredData) {
   <!--ADMIN_END-->
 
 </div></div>
+
 
 
 </body></html>
