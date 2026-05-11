@@ -10,7 +10,7 @@
     :root{--bg:#f7f5f0;--white:#fff;--ink:#1a1814;--muted:#9b9690;--border:#e4e0d8;--accent:#c8622a;--accent-l:#fdf0e8;--blue:#3a6b8a;--blue-l:#eaf2f7;--green:#3a7a5a;--green-l:#eaf5ef;--red:#b94040;--red-l:#fdf0ee}
     *{margin:0;padding:0;box-sizing:border-box;transition:background-color .2s,border-color .2s,color .15s}
     body{background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif;min-height:100vh}
-    .topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 36px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+    .topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 36px;height:120px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
     .brand{font-family:'DM Serif Display',serif;font-size:18px}.brand span{color:var(--accent)}
     .topbar-right{display:flex;align-items:center;gap:8px}
     .tab-btn{padding:7px 15px;border:1px solid var(--border);border-radius:8px;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .18s}
@@ -65,7 +65,7 @@
     .data-table-head span{font-size:12px;color:var(--muted)}
     .dt-scroll{overflow-x:auto}
     .dt-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:auto}
-    .dt-table thead th{padding:6px 8px;background:var(--bg);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var;text-align:center;border-bottom:1px solid var(--border);white-space:nowrap}
+    .dt-table thead th{padding:6px 8px;background:var(--bg);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink);text-align:center;border-bottom:1px solid var(--border);white-space:nowrap}
     .dt-table thead th.num{text-align:center;min-width:0}
     .dt-table tbody tr{border-bottom:1px solid var(--border);transition:background .12s}
     .dt-table tbody tr:last-child{border-bottom:none}
@@ -225,7 +225,7 @@
     <div class="dash-main">
 
     <div class="info-card" style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:10px">
-      <p style="text-indent: 20px; font-size:16px;line-height:1.7;color:var">მოცემულ გვერდზე შეგიძლიათ იხილოთ მონაცემები სამსახურის მიერ 2026 წელს ადმინისტრირებადი პროგრამებისა და ქვეპროგრამების ბიუჯეტის პარამეტრების შესახებ.</p>
+      <p style="text-indent: 20px; font-size:16px;line-height:1.7;color:var(--ink)">მოცემულ გვერდზე შეგიძლიათ იხილოთ მონაცემები სამსახურის მიერ 2026 წელს ადმინისტრირებადი პროგრამებისა და ქვეპროგრამების ბიუჯეტის პარამეტრების შესახებ.</p>
     </div>
 
     <div class="controls-card">
@@ -295,7 +295,7 @@
   
 
 
-<div class="toast" id="toast">✓ ექსპორტი — statistics_budget.html</div>
+<div class="toast" id="toast">✓ შენახულია — charts_budget_admin.html</div>
 
 
 <script>
@@ -549,7 +549,10 @@ function switchTab(tab){
 // ── Detect extra columns ──────────────────────────────────────
 function detectExtraCols(){
   if(!DATA.length){ EXTRA_COLS=[]; return; }
-  EXTRA_COLS = Object.keys(DATA[0]).filter(k=>!REQUIRED.includes(k));
+  // scan all rows (not just first) — ქვეპროგრამებს შეიძლება სხვადასხვა ექსტრა სვეტი ჰქონდეთ
+  const allKeys = new Set();
+  DATA.forEach(r => Object.keys(r).forEach(k => allKeys.add(k)));
+  EXTRA_COLS = [...allKeys].filter(k=>!REQUIRED.includes(k));
 }
 
 // ── Georgian date/month sort key ──────────────────────────────
@@ -747,7 +750,6 @@ function renderSimpleChart(rows){
           legend:{display:true,position:'bottom',labels:{font:{family:'DM Sans',size:12},color:'#1a1814',padding:14,boxWidth:12},afterFit(box){box.height+=50;}},
           tooltip:{backgroundColor:'#fff',borderColor:'#e4e0d8',borderWidth:1,titleColor:'#9b9690',bodyColor:'#1a1814',bodyFont:{family:'DM Sans',weight:'600',size:13},padding:12,cornerRadius:8,
             callbacks:{label:ctx=>{
-              const cfg=METRIC_CONFIG.find(m=>m.key===curMetric);
               return `${ctx.label}: ${fmtMetric(ctx.raw, cfg)}`;
             }}
           }
@@ -836,10 +838,14 @@ function renderGroupedChart(rows){
   });
 
   if(chart){chart.destroy();chart=null;}
+  const hasY2Grouped = (function(){
+    const cfg = METRIC_CONFIG.find(m=>m.key===curMetric);
+    return cfg?.yAxis === 'y2' || cfg?.type === 'pct';
+  })();
   chart = new Chart(document.getElementById('main-chart'),{
     type: isLine?'line':'bar',
     data:{labels:years.map(String),datasets},
-    options:chartOpts(isStacked,true,isLine),
+    options:chartOpts(isStacked,true,isLine,hasY2Grouped),
     plugins:[labelPlugin, lineRevealPlugin]
   });
   if(isLine) startLineReveal(chart);
@@ -1067,7 +1073,7 @@ function renderDataTable(rows){
     const gVals = [...new Set(rows.map(r=>r[gCol]).filter(v=>v!=null&&v!==''))].sort();
     const span  = gVals.length;
     const lk = {}; rows.forEach(r=>{ lk[`${r.year}__${r[gCol]}`]=r; });
-    head.innerHTML=`<tr><th rowspan="2" style="vertical-align:middle;min-width:110px">მაჩვენებელი</th>${years.map(y=>`<th colspan="${span}" style="text-align:center;border-left:2px solid var(--border)">${y}</th>`).join('')}</tr><tr>${years.map(()=>gVals.map((gv,gi)=>`<th class="num" style="${gi===0?'border-left:2px solid var(--border)':''}\">${esc(String(gv))}</th>`).join('')).join('')}</tr>`;
+    head.innerHTML=`<tr><th rowspan="2" style="vertical-align:middle;min-width:110px">მაჩვენებელი</th>${years.map(y=>`<th colspan="${span}" style="text-align:center;border-left:2px solid var(--border)">${y}</th>`).join('')}</tr><tr>${years.map(()=>gVals.map((gv,gi)=>`<th class="num" style="${gi===0?'border-left:2px solid var(--border)':''}">${esc(String(gv))}</th>`).join('')).join('')}</tr>`;
     body.innerHTML = metricsToShow.map(key=>{
       const cfg=METRIC_CONFIG.find(m=>m.key===key);
       const label=(cfg?.label)||key;
@@ -1651,7 +1657,7 @@ function getAvailableMetricKeys(){
 
 // Dashboard pills-ის დინამიური გადაგენერირება METRIC_CONFIG-ის მიხედვით
 // მხარდაჭერა: single (ერთი active) და multi (რამდენიმე active)
-let activeMetrics = new Set(['request count']); // multi-mode-სთვის
+let activeMetrics = new Set(); // ცარიელი — rebuildDashboardPills() აავსებს METRIC_CONFIG-ის მიხედვით
 
 function rebuildDashboardPills(){
   const cont = document.querySelector('.metric-pills');
@@ -1981,7 +1987,7 @@ function finishImport(){
   detectExtraCols();
   // იმპორტის შემდეგ METRIC_CONFIG არ იცვლება ავტომატურად —
   // მომხმარებელმა თვითონ უნდა დაამატოს მაჩვენებლები ⚙️ მაჩვენებლების პანელში
-  sortData(); buildSelects(); rebuildDashboardPills(); renderDashboard(); switchTab('dashboard'); renderEditorTable();
+  sortData(); buildSelects(); rebuildDashboardPills(); renderDashboard(); renderEditorTable();
   toast(`✓ ${DATA.length} სტრიქონი შემოტანილია`);
   switchTab('admin');
 }
@@ -1994,15 +2000,7 @@ document.getElementById('prog-sel').addEventListener('change',e=>{
   curSub=subs[0]; subSel.value=curSub; renderDashboard();
 });
 document.getElementById('sub-sel').addEventListener('change',e=>{curSub=e.target.value;renderDashboard();});
-document.querySelectorAll('.pill[data-m]').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    curMetric=btn.dataset.m;
-    document.querySelectorAll('.pill[data-m]').forEach(b=>b.className='pill');
-    const cfg=METRIC_CONFIG.find(m=>m.key===curMetric);
-    btn.classList.add((cfg?.type==='amount'||cfg?.type==='pct')?'aa':'ac');
-    renderDashboard();
-  });
-});
+// NOTE: pill click listeners are attached in rebuildDashboardPills() — do not duplicate here
 document.querySelectorAll('.mode-btn[data-mode]').forEach(btn=>{
   btn.addEventListener('click',()=>{
     curMode=btn.dataset.mode;
@@ -2067,9 +2065,6 @@ function updateMetricButtons(filteredData) {
 </script>
 
   <!--ADMIN_START--></div>
-
-
-
 
 
 
