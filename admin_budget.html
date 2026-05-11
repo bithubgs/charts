@@ -1435,7 +1435,7 @@ function exportTableExcel(){
   toast('✓ ცხრილი ჩამოიტვირთა');
 }
 
-function saveHTML(){ download(getExportHTML(true), 'budget_admin.html'); toast('✓ შენახულია — budget_admin.html'); }
+function saveHTML(){ download(getExportHTML(true), 'admin_budget.html'); toast('✓ შენახულია — admin_budget.html'); }
 function exportPublicHTML(){ download(getExportHTML(false), 'budget.html'); toast('✓ ექსპორტი — budget.html'); }
 
 // ── Excel-ად ექსპორტი ────────────────────────────────────────
@@ -2150,7 +2150,7 @@ function updateMetricButtons(filteredData) {
       <div class="info-box-icon">💡</div>
       <div>
         <h4>როგორ გამოვიყენო?</h4>
-        <p>შეიტანე Excel/CSV <strong>ან</strong> შეცვალე ხელით → <strong>💾 შენახვა</strong> → ჩამოიტვირთება <strong>budget_admin.html</strong> (ყველა ცვლილებით).</p>
+        <p>შეიტანე Excel/CSV <strong>ან</strong> შეცვალე ხელით → <strong>💾 შენახვა</strong> → ჩამოიტვირთება <strong>admin_budget.html</strong> (ყველა ცვლილებით).</p>
         <p style="margin-top:5px;color:var(--blue)">საიტზე გასაგზავნად: <strong>⬇ ექსპორტი საიტისთვის</strong> → <strong>budget.html</strong></p>
       </div>
     </div>
@@ -2366,6 +2366,7 @@ function updateMetricButtons(filteredData) {
   <!--ADMIN_END-->
 
 </div></div>
+
 
 
 
